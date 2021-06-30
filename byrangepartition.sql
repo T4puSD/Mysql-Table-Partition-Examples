@@ -178,3 +178,13 @@ UPDATE employees SET store_id = 7 where id=42;
 
 -- It does move the data to different partition
 EXPLAIN SELECT * FROM employees PARTITION (p1) WHERE id = 42;
+
+
+ALTER TABLE employees REMOVE PARTITIONING;
+
+ALTER TABLE employees PARTITION BY RANGE (store_id) (
+    PARTITION p0 VALUES LESS THAN (6),
+    PARTITION p1 VALUES LESS THAN (11),
+    PARTITION p2 VALUES LESS THAN (16),
+    PARTITION p3 VALUES LESS THAN MAXVALUE
+    );
