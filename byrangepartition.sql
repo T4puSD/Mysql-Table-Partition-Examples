@@ -171,4 +171,10 @@ INSERT INTO employees (id, fname, lname, job_code, store_id)
 
 -- as we can see that without the store id these record is stored into p0
 -- because of the partition condition anything whose store id is less than 6 will fall under p0
-EXPLAIN SELECT * FROM employees WHERE store_id is NULL;
+EXPLAIN SELECT * FROM employees PARTITION (p0) WHERE id = 42;
+
+-- Testing if changing the partition by column value move the row in the correct partition
+UPDATE employees SET store_id = 7 where id=42;
+
+-- It does move the data to different partition
+EXPLAIN SELECT * FROM employees PARTITION (p1) WHERE id = 42;
