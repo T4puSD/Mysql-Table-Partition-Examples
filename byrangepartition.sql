@@ -136,11 +136,11 @@ EXPLAIN SELECT * FROM employees WHERE id= 3 and store_id < 11;
 -- This query will only search in partition p3
 EXPLAIN SELECT * FROM employees PARTITION (p3) WHERE id=3;
 
--- !!!! We can't add new partition like these becaseu the last partition (p3)
+-- !!!! We can't add new partition like these because the last partition (p3)
 -- is already declared with range maxvalue.
 ALTER TABLE employees ADD PARTITION (PARTITION p4 VALUES LESS THAN (21));
 
--- splitting partition p3 into p3 and p4
+-- a workaround for this issue to to reorganize and splitting partition p3 into p3 and p4
 ALTER TABLE employees REORGANIZE PARTITION p3 INTO (
     PARTITION p3 VALUES LESS THAN (25),
     PARTITION p4 VALUES LESS THAN MAXVALUE
