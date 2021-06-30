@@ -136,7 +136,7 @@ EXPLAIN SELECT * FROM employees WHERE id= 3 and store_id < 11;
 -- This query will only search in partition p3
 EXPLAIN SELECT * FROM employees PARTITION (p3) WHERE id=3;
 
--- !!!! We can't add new partition like these because the last partition (p3)
+-- ### We can't add new partition like these because the last partition (p3)
 -- is already declared with range maxvalue.
 ALTER TABLE employees ADD PARTITION (PARTITION p4 VALUES LESS THAN (21));
 
@@ -161,3 +161,14 @@ ALTER TABLE employees REORGANIZE PARTITION p3, p4 INTO (
 SELECT * from information_schema.PARTITIONS where TABLE_NAME='employees';
 
 SELECT * FROM employees PARTITION (p3);
+
+-- ### testing what will happen when the partition by column is null
+-- making the store_id column nullable
+ALTER TABLE employees MODIFY COLUMN store_id int;
+-- inserting a new row with null store_id
+INSERT INTO employees (id, fname, lname, job_code, store_id)
+    VALUES (42, 't42', 't42-l', 102, NULL);
+
+-- as we can see that without the store id these record is stored into p0
+-- because of the partition condition anything whose store id is less than 6 will fall under p0
+EXPLAIN SELECT * FROM employees WHERE store_id is NULL;
